@@ -10,6 +10,7 @@ import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 
 import com.datacrucis.storm.bolt.PrinterBolt;
+import com.datacrucis.storm.bolt.SentimenterBolt;
 import com.datacrucis.storm.spout.TwitterStreamSpout;
 
 
@@ -30,7 +31,6 @@ class TwitterHappinessTopology {
         String twitterAccessTokenSecret = properties.getString("twitter.access.secret");
 
         String[] twitterQueryKeywords   = properties.getStringArray("twitter.query.keywords");
-        String[] twitterQueryLanguage   = properties.getStringArray("twitter.query.language");
 
         final Config conf = new Config();
         conf.setNumWorkers(
@@ -45,18 +45,26 @@ class TwitterHappinessTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(
-            "spout", new TwitterStreamSpout(
+            "spout", 
+            new TwitterStreamSpout(
                 twitterConsumerKey,
                 twitterConsumerSecret,
                 twitterAccessTokenKey,
                 twitterAccessTokenSecret,
-                twitterQueryKeywords,
+                String[]{"en"},
                 null,
                 twitterQueryLanguage)
         );
+
         builder.setBolt(
-            "print", new PrinterBolt()
+            "sentiment",
+            new SentimenterBolt()
         ).shuffleGrouping("spout");
+
+        builder.setBolt(
+            "print",
+            new PrinterBolt()
+        ).shuffleGrouping("sentiment");
 
         if (!isLocalMode) {
             StormSubmitter.submitTopologyWithProgressBar(
