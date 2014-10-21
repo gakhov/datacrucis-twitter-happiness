@@ -1,0 +1,16 @@
+h1. Twitter happiness Topology
+
+h2. Getting started
+
+You need to have Maven (preferably version 3.x). You can install it by following the [http://maven.apache.org/download.cgi Maven installation instructions].
+
+h4. Run topology in local mode
+
+Topology can be run with maven-exec-plugin in local mode:
+
+@$ mvn compile exec:java -Dstorm.topology=com.datacrucis.storm.TwitterHappinessTopology@
+
+
+h4. Packaging for use on a Storm cluster
+
+@$ mvn package@
