@@ -112,8 +112,6 @@ public class TwitterStreamSpout extends BaseRichSpout {
         AccessToken token = new AccessToken(accessToken, accessTokenSecret);
         twitterStream.setOAuthAccessToken(token);
 
-        String[] = ImmutableList.copyOf()
-
         // TODO: this is not enough, since it could be list with empty string
         if (keywords == null && locations == null) {
             twitterStream.sample();
@@ -172,6 +170,6 @@ public class TwitterStreamSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("tweet"));
+        declarer.declare(new Fields("status"));
     }
 }

@@ -1,10 +1,15 @@
 package com.datacrucis.storm.bolt;
 
+import java.util.Map;
 import java.util.Properties;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Values;
 import backtype.storm.tuple.Tuple;
 
 import twitter4j.Status;
@@ -20,40 +25,40 @@ import edu.stanford.nlp.util.CoreMap;
 
 public class SentimenterBolt extends BaseBasicBolt {
 
-    private OutputCollector collector;
-    private StanfordCoreNLP pipelineNLP;
+    private OutputCollector _collector;
+    private StanfordCoreNLP _pipelineNLP;
 
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this.collector = collector;
+        this._collector = collector;
 
         Properties properties = new Properties();
-        properties.put("annotators", "tokenize, ssplit, parse, sentiment")
-        this.pipelineNLP = new StanfordCoreNLP(properties);
+        properties.put("annotators", "tokenize, ssplit, parse, sentiment");
+        this._pipelineNLP = new StanfordCoreNLP(properties);
     }
 
     @Override
     public void execute(Tuple tuple, BasicOutputCollector collector) {
-        final Status status = (Status) input.getValueByField("tweet");
+        final Status status = (Status) tuple.getValueByField("status");
 
-        int sentiment = this.getSentiment(status.getText());
+        Integer sentiment = this.getSentiment(status.getText());
 
-        collector.emit(tuple, new Values(tweet, sentiment)));
-        collector.ack(tuple);
+        _collector.emit(tuple, new Values(status, sentiment));
+        _collector.ack(tuple);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("tweet", "sentiment"));
+        declarer.declare(new Fields("status", "sentiment"));
     }
 
-    private int getSentiment(String tweet) {
+    private Integer getSentiment(String tweet) {
         if (tweet == null || tweet.length() < 1) {
             return null;
         }
 
-        int sentiment = 0;
+        Integer sentiment = 0;
         int longestChunk = 0;
-        Annotation annotation = pipelineNLP.process(tweet);
+        Annotation annotation = _pipelineNLP.process(tweet);
         for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
             Tree tree = sentence.get(SentimentCoreAnnotations.AnnotatedTree.class);
             int sentimentClass = RNNCoreAnnotations.getPredictedClass(tree);
@@ -61,7 +66,7 @@ public class SentimenterBolt extends BaseBasicBolt {
             if (chunk.length() > longestChunk) {
                 sentiment = sentimentClass;
                 longestChunk = chunk.length();
-            } 
+            }
         }
         return sentiment;
     }

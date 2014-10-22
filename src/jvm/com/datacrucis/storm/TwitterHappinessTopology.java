@@ -31,6 +31,7 @@ class TwitterHappinessTopology {
         String twitterAccessTokenSecret = properties.getString("twitter.access.secret");
 
         String[] twitterQueryKeywords   = properties.getStringArray("twitter.query.keywords");
+        String[] twitterQueryLanguage   = {"en"};
 
         final Config conf = new Config();
         conf.setNumWorkers(
@@ -45,13 +46,13 @@ class TwitterHappinessTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(
-            "spout", 
+            "spout",
             new TwitterStreamSpout(
                 twitterConsumerKey,
                 twitterConsumerSecret,
                 twitterAccessTokenKey,
                 twitterAccessTokenSecret,
-                String[]{"en"},
+                twitterQueryKeywords,
                 null,
                 twitterQueryLanguage)
         );
