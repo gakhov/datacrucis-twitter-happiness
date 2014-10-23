@@ -1,13 +1,13 @@
 package com.datacrucis.storm.bolt;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.tuple.Tuple;
@@ -23,27 +23,29 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 
 
-public class SentimenterBolt extends BaseBasicBolt {
+public class SentimenterBolt extends BaseRichBolt {
 
-    private OutputCollector _collector;
-    private StanfordCoreNLP _pipelineNLP;
+    private OutputCollector collector;
+    private StanfordCoreNLP pipelineNLP;
 
+    @SuppressWarnings("rawtypes")
+    @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-        this._collector = collector;
+        this.collector = collector;
 
         Properties properties = new Properties();
-        properties.put("annotators", "tokenize, ssplit, parse, sentiment");
-        this._pipelineNLP = new StanfordCoreNLP(properties);
+        properties.setProperty("annotators", "tokenize, ssplit, parse, sentiment");
+        pipelineNLP = new StanfordCoreNLP(properties);
     }
 
     @Override
-    public void execute(Tuple tuple, BasicOutputCollector collector) {
+    public void execute(Tuple tuple) {
         final Status status = (Status) tuple.getValueByField("status");
 
         Integer sentiment = this.getSentiment(status.getText());
 
-        _collector.emit(tuple, new Values(status, sentiment));
-        _collector.ack(tuple);
+        collector.emit(tuple, new Values(status, sentiment));
+        collector.ack(tuple);
     }
 
     @Override
@@ -51,6 +53,19 @@ public class SentimenterBolt extends BaseBasicBolt {
         declarer.declare(new Fields("status", "sentiment"));
     }
 
+    /**
+     * Return a sentiment value of the input string.
+     *
+     * If input string empty or null, this method returns null, otherwise
+     * 0 - Very Negative
+     * 1 - Negative
+     * 2 - Neutral
+     * 3 - Positive
+     * 4 - Very Positive
+     *
+     * @param  tweet  string content of the Twitter status
+     * @return      sentiment value
+     */
     private Integer getSentiment(String tweet) {
         if (tweet == null || tweet.length() < 1) {
             return null;
@@ -58,7 +73,8 @@ public class SentimenterBolt extends BaseBasicBolt {
 
         Integer sentiment = 0;
         int longestChunk = 0;
-        Annotation annotation = _pipelineNLP.process(tweet);
+
+        Annotation annotation = pipelineNLP.process(tweet);
         for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
             Tree tree = sentence.get(SentimentCoreAnnotations.AnnotatedTree.class);
             int sentimentClass = RNNCoreAnnotations.getPredictedClass(tree);
