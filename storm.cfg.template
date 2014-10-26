@@ -3,12 +3,19 @@ storm.max_task_parallel = 36
 storm.max_spout_pending = 300
 storm.message_timeout_secs = 90
 storm.num_workers = 1
-storm.tick_frequency = 100
 
 twitter.consumer.key =
 twitter.consumer.secret =
 twitter.access.key =
 twitter.access.secret =
 
-twitter.query.keywords = usa
+twitter.query.keywords = weather
 twitter.query.language = en
+
+es.cluster_name = datacrucis
+es.host = localhost
+es.port = 9300
+es.local_mode = true
+
+es.index.name_for_mood = mood
+es.index.name_for_counts = counts

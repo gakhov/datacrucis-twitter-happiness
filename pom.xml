@@ -63,6 +63,11 @@
         <version>3.4.1</version>
         <classifier>models</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>1.1.0</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>datacrucis-twitter-happiness</finalName>

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -27,6 +29,8 @@ public class SentimenterBolt extends BaseRichBolt {
 
     private OutputCollector collector;
     private StanfordCoreNLP pipelineNLP;
+
+    private static final Logger log = Logger.getLogger(SentimenterBolt.class);
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -64,12 +68,16 @@ public class SentimenterBolt extends BaseRichBolt {
      * 4 - Very Positive
      *
      * @param  tweet  string content of the Twitter status
-     * @return      sentiment value
+     * @return        sentiment value [0, 4]
      */
     private Integer getSentiment(String tweet) {
         if (tweet == null || tweet.length() < 1) {
+            log.warn("Empty tweet detected, skipping ...");
             return null;
         }
+
+        // avoid badly encoded emoticons
+        tweet = tweet.replaceAll("[^\\x00-\\x7f-\\x80-\\xad]", "");
 
         Integer sentiment = 0;
         int longestChunk = 0;
@@ -77,7 +85,7 @@ public class SentimenterBolt extends BaseRichBolt {
         Annotation annotation = pipelineNLP.process(tweet);
         for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
             Tree tree = sentence.get(SentimentCoreAnnotations.AnnotatedTree.class);
-            int sentimentClass = RNNCoreAnnotations.getPredictedClass(tree);
+            Integer sentimentClass = RNNCoreAnnotations.getPredictedClass(tree);
             String chunk = sentence.toString();
             if (chunk.length() > longestChunk) {
                 sentiment = sentimentClass;

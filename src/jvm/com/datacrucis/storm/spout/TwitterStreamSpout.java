@@ -121,7 +121,7 @@ public class TwitterStreamSpout extends BaseRichSpout {
             /*
                 NOTE: Twitter streaming API does not allow searching
                 by both keyword AND location. Instead it does OR, so
-                we explicitelly select here which parameters to use
+                we explicitly select here which parameters to use
             */
             if (keywords != null) {
                 query.track(keywords);
