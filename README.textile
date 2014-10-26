@@ -2,13 +2,13 @@ h1. Twitter happiness Topology
 
 h2. Getting started
 
-You need to have Maven (preferably version 3.x). You can install it by following the [http://maven.apache.org/download.cgi Maven installation instructions].
+You need to have Maven (preferably version 3.x). You can install it by following the Maven installation instructions from http://maven.apache.org/download.cgi.
 
 h4. Create a configuration file from template
 
 @$ cp storm.cfg.template storm.cfg@
 
-Aftewards, edit @storm.cfg@ and put your Twitter credentials, search keywords and Elasticsearch configuration.
+After that, edit @storm.cfg@ and put your Twitter credentials, search keywords and Elasticsearch configuration.
 
 h4. Run topology in local mode
 
