@@ -11,3 +11,4 @@ lib/
 maven_repository
 storm.cfg
 target/
+.DS_Store
