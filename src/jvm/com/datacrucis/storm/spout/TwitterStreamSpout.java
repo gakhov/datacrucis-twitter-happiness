@@ -48,15 +48,12 @@ public class TwitterStreamSpout extends BaseRichSpout {
     /* keywords to track */
     String[] keywords;
 
-    /* Locations to track. 2D array */
-    double[][] locations;
-
     /* Tweets language of the stream */
     String[] language;
 
     public TwitterStreamSpout(String consumerKey, String consumerSecret,
             String accessToken, String accessTokenSecret, String[] keywords,
-            double[][] locations, String[] language) {
+            String[] language) {
         this.consumerKey = consumerKey;
         this.consumerSecret = consumerSecret;
         this.accessToken = accessToken;
@@ -113,23 +110,13 @@ public class TwitterStreamSpout extends BaseRichSpout {
         twitterStream.setOAuthAccessToken(token);
 
         // TODO: this is not enough, since it could be list with empty string
-        if (keywords == null && locations == null) {
+        if (keywords == null) {
             twitterStream.sample();
         }
         else {
             FilterQuery query = new FilterQuery();
-            /*
-                NOTE: Twitter streaming API does not allow searching
-                by both keyword AND location. Instead it does OR, so
-                we explicitly select here which parameters to use
-            */
-            if (keywords != null) {
-                query.track(keywords);
-            }
-            else {
-                query.locations(locations);
-            }
 
+            query.track(keywords);
             if (language != null && language.length > 0) {
                 query.language(language);
             }

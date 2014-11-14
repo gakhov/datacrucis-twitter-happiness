@@ -64,7 +64,6 @@ class TwitterHappinessTopology {
                 twitterAccessTokenKey,
                 twitterAccessTokenSecret,
                 twitterQueryKeywords,
-                null,
                 twitterQueryLanguage)
         );
 

@@ -30,13 +30,13 @@ public class CounterBolt extends BaseRichBolt {
             Arrays.asList("shortTerm", "middleTerm", "longTerm"))
     );
     private final String[] sentimentToClass = {
-        "VeryNegative", 
+        "VeryNegative",
         "Negative",
         "Neutral",
         "Positive",
         "VeryPositive"
     };
-    
+
     private int tickTupleCount;
     private int tickFrequencyInSeconds;
 
@@ -54,7 +54,7 @@ public class CounterBolt extends BaseRichBolt {
     }
 
     private boolean isTickTuple(Tuple tuple) {
-        return tuple.getSourceComponent().equals(Constants.SYSTEM_COMPONENT_ID) 
+        return tuple.getSourceComponent().equals(Constants.SYSTEM_COMPONENT_ID)
             && tuple.getSourceStreamId().equals(Constants.SYSTEM_TICK_STREAM_ID);
     }
 

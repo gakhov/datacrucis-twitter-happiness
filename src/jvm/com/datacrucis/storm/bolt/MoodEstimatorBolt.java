@@ -87,7 +87,7 @@ public class MoodEstimatorBolt extends BaseRichBolt {
 
         String moodClass;
         if(moodValue > 0.05) {
-            moodClass = new String("neu");
+            moodClass = new String("pos");
         }
         else if(moodValue < -0.05) {
             moodClass = new String("neg");
