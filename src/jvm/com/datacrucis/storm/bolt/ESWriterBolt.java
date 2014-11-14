@@ -38,8 +38,13 @@ public class ESWriterBolt extends BaseRichBolt{
     private Boolean isLocalMode;
 
     private static DateFormat esISOFormatter;
-
     private static final Logger log = Logger.getLogger(ESWriterBolt.class);
+
+    static {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        esISOFormatter = new SimpleDateFormat("yyyyMMdd'T'HHmmss.SSSSSS'Z'");
+        esISOFormatter.setTimeZone(utc);
+    }
 
     public ESWriterBolt(String esClusterName, String esHost, Integer esPort,
                         String indexName, Boolean isLocalMode) {
@@ -49,10 +54,6 @@ public class ESWriterBolt extends BaseRichBolt{
         this.esPort = esPort;
         this.indexName = indexName;
         this.isLocalMode = isLocalMode;
-
-        TimeZone utc = TimeZone.getTimeZone("UTC");
-        this.esISOFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
-        this.esISOFormatter.setTimeZone(utc);
     }
 
     @SuppressWarnings("rawtypes")
@@ -104,16 +105,17 @@ public class ESWriterBolt extends BaseRichBolt{
         final Date date = (Date) tuple.getValueByField("date");
 
         Map<String, Object> esItem = getESItem(item, date);
-        // try {
+        try {
             IndexResponse response = client.prepareIndex(indexName, itemType)
                 .setSource(esItem)
                 .execute()
                 .actionGet();
-        // } catch (Exception e) {
-        //     collector.fail(tuple);
-        //     log.warn("Index request failed ...");
-        //     return;
-        // }
+        } catch (Exception e) {
+            collector.fail(tuple);
+            log.warn("Index request failed ...");
+            log.warn(e.getMessage());
+            return;
+        }
 
         collector.ack(tuple);
     }
