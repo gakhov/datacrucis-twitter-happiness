@@ -6,7 +6,7 @@ You need to have Maven (preferably version 3.x). You can install it by following
 
 h4. Create a configuration file from template
 
-@$ cp storm.cfg.template storm.cfg@
+@$ cp misc/storm.cfg.template storm.cfg@
 
 After that, edit @storm.cfg@ and put your Twitter credentials, search keywords and Elasticsearch configuration.
 
@@ -17,6 +17,15 @@ Topology can be run with maven-exec-plugin in local mode:
 @$ mvn clean compile exec:java -Dstorm.topology=com.datacrucis.storm.TwitterHappinessTopology@
 
 
-h4. Packaging for use on a Storm cluster
+h4. Run topology with a Storm cluster
 
-@$ mvn package@
+@$ mvn clean package@
+
+If you compile/package project on the Storm node, then the deployment command could be just
+
+@storm jar target/datacrucis-twitter-happiness-jar-with-dependencies.jar com.datacrucis.storm.TwitterHappinessTopology TwitterTopology storm.cfg -c nimbus.host=localhost@
+
+If you operate Elasticseach in a cluster mode, then it's necessary to create indexes with an appropriate mappings:
+
+@curl -XPUT http://localhost:9200/counts/ -d @misc/es.index.counts.json@
+@curl -XPUT http://localhost:9200/mood/ -d @misc/es.index.mood.json@
