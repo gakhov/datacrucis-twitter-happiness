@@ -1,0 +1,51 @@
+{
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "15s"
+    },
+    "mappings": {
+        "short": {
+            "date_detection" : false,
+            "_timestamp" : {
+                "enabled" : true,
+                "path" : "timestamp",
+                "format" : "basic_date_time"
+            },
+            "properties": {
+                "moodValue": {
+                    "type": "integer"
+                },
+                "moodClass": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "format": "basic_date_time",
+                    "type": "date"
+                }
+            }
+        },
+        "long": {
+            "date_detection" : false,
+            "_timestamp" : {
+                "enabled" : true,
+                "path" : "timestamp",
+                "format" : "basic_date_time"
+            },
+            "properties": {
+                "moodValue": {
+                    "type": "integer"
+                },
+                "moodClass": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "format": "basic_date_time",
+                    "type": "date"
+                }
+            }
+        }
+    }
+}
