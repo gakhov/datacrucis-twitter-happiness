@@ -14,7 +14,7 @@
             },
             "properties": {
                 "moodValue": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "moodClass": {
                     "index": "not_analyzed",
@@ -35,7 +35,7 @@
             },
             "properties": {
                 "moodValue": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "moodClass": {
                     "index": "not_analyzed",
